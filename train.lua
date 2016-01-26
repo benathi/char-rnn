@@ -22,7 +22,8 @@ require 'lfs'
 require 'util.OneHot'
 require 'util.misc'
 local CharSplitLMMinibatchLoader = require 'util.CharSplitLMMinibatchLoader'
-local model_utils = require 'util.model_utils'
+-- made this global
+model_utils = require 'util.model_utils'
 local LSTM = require 'model.LSTM'
 
 cmd = torch.CmdLine()
@@ -54,7 +55,7 @@ cmd:option('-eval_val_every',1000,'every how many iterations should we evaluate 
 cmd:option('-checkpoint_dir', 'cv', 'output directory where checkpoints get written')
 cmd:option('-savefile','lstm','filename to autosave the checkpont to. Will be inside checkpoint_dir/')
 -- GPU/CPU
-cmd:option('-gpuid',0,'which gpu to use. -1 = use CPU')
+cmd:option('-gpuid',-1,'which gpu to use. -1 = use CPU')
 cmd:text()
 
 -- parse input params
@@ -71,7 +72,8 @@ if opt.gpuid >= 0 then
     cutorch.setDevice(opt.gpuid + 1) -- note +1 to make it 0 indexed! sigh lua
 end
 -- create the data loader class
-local loader = CharSplitLMMinibatchLoader.create(opt.data_dir, opt.batch_size, opt.seq_length, split_sizes)
+-- made loader global
+loader = CharSplitLMMinibatchLoader.create(opt.data_dir, opt.batch_size, opt.seq_length, split_sizes)
 local vocab_size = loader.vocab_size  -- the number of distinct characters
 print('vocab size: ' .. vocab_size)
 -- make sure output directory exists
